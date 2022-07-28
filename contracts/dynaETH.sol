@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract Shinata is ERC20, Ownable {
+contract dynaETH is ERC20, Ownable {
 	using SafeMath for uint256;
 
 	IUniswapV2Router02 public immutable uniswapV2Router;
@@ -97,7 +97,7 @@ contract Shinata is ERC20, Ownable {
 
 	event ManualNukeLP();
 
-	constructor() ERC20("Shinata", "Shinata") {
+	constructor() ERC20("dynaETH", "dynaETH") {
 		IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
 			0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
 		);
