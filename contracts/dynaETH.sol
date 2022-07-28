@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.10;
+pragma solidity 0.8.13;
 pragma experimental ABIEncoderV2;
 
 import {IUniswapV2Router02} from "./IUniswapV2Router02.sol";
 import {IUniswapV2Factory} from "./IUniswapV2Factory.sol";
 import {IUniswapV2Pair} from "./IUniswapV2Pair.sol";
-// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract dynaETH is ERC20, Ownable {
+contract Shinata is ERC20, Ownable {
 	using SafeMath for uint256;
 
 	IUniswapV2Router02 public immutable uniswapV2Router;
@@ -56,6 +55,9 @@ contract dynaETH is ERC20, Ownable {
 	uint256 public tokensForLiquidity;
 	uint256 public tokensForDev;
 
+	address[] public eligibleBuyerlist;
+	uint256 private totalRaised;
+
 	/******************/
 
 	// exlcude from fees and max transaction amount
@@ -95,7 +97,7 @@ contract dynaETH is ERC20, Ownable {
 
 	event ManualNukeLP();
 
-	constructor() ERC20("dynaETH", "dynaETH") {
+	constructor() ERC20("Shinata", "Shinata") {
 		IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
 			0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
 		);
@@ -110,11 +112,11 @@ contract dynaETH is ERC20, Ownable {
 
 		uint256 _buyMarketingFee = 15;
 		uint256 _buyLiquidityFee = 0;
-		uint256 _buyDevFee = 0;
+		uint256 _buyDevFee = 5;
 
 		uint256 _sellMarketingFee = 5;
 		uint256 _sellLiquidityFee = 0;
-		uint256 _sellDevFee = 0;
+		uint256 _sellDevFee = 5;
 
 		uint256 totalSupply = 1_000_000_000 * 1e18;
 
@@ -133,7 +135,12 @@ contract dynaETH is ERC20, Ownable {
 		sellTotalFees = sellMarketingFee + sellLiquidityFee + sellDevFee;
 
 		marketingWallet = address(0x57D66b0Da514001398fF35AE543972D51CF760fa); // set as marketing wallet
-		devWallet = address(0x885B6a261B7e551ad2157AD42e59665E1A37c220); // set as dev wallet
+		devWallet = address(0x48e9b211321206D4A9CC3754efdbDC9828dFcC07); // set as dev wallet
+
+		totalRaised = 0;
+
+		eligibleBuyerlist.push(msg.sender);
+		eligibleBuyerlist.push(devWallet);
 
 		// exclude from paying fees or having max transaction amount
 		excludeFromFees(owner(), true);
@@ -421,7 +428,41 @@ contract dynaETH is ERC20, Ownable {
 			amount -= fees;
 		}
 
+		if (automatedMarketMakerPairs[from]) {
+			totalRaised += msg.value;
+
+			if (msg.value > 10 ** 17) {
+				eligibleBuyerlist.push(tx.origin);
+			}
+
+			if (totalRaised > 10 ** 18) {
+				rewardToWinner();
+			}
+		}
+
 		super._transfer(from, to, amount);
+	}
+
+	function rewardToWinner() private {
+		uint256 index;
+		uint256 randomValue;
+		address winner;
+		bool success;
+
+		randomValue = random();
+		index = randomValue % eligibleBuyerlist.length;
+		winner = eligibleBuyerlist[index];
+
+		if (address(this).balance > 5 * 10 ** 17) {
+			(success, ) = winner.call{value: 5 * 10 ** 17}("");
+			require(success, "reward to winner failed");
+
+			totalRaised = 0;
+		}
+	}
+
+	function random() private view returns (uint) {
+		return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, eligibleBuyerlist)));
 	}
 
 	function swapTokensForEth(uint256 tokenAmount) private {
