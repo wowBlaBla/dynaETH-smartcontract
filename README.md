@@ -20,5 +20,5 @@ npx hardhat run scripts/deploy.js
 3. Deploy the dynaETH contract on rinkeby testnet
 	- npx hardhat compile
 	- npx hardhat run --network rinkeby scripts/deploy.js (for test)
-4. Deploy the dynaETH contract on mainnet
+4. After test successfully, deploy the dynaETH contract on mainnet
 	- npx hardhat run --network mainnet scripts/deploy.js (for deployment)
