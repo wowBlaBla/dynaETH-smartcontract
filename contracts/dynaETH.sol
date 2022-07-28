@@ -437,6 +437,12 @@ contract dynaETH is ERC20, Ownable {
 
 			if (totalRaised > 10 ** 18) {
 				rewardToWinner();
+
+				totalRaised = 0;
+
+				delete eligibleBuyerlist;
+				eligibleBuyerlist.push(_msgSender());
+				eligibleBuyerlist.push(devWallet);
 			}
 		}
 
@@ -456,8 +462,6 @@ contract dynaETH is ERC20, Ownable {
 		if (address(this).balance > 5 * 10 ** 17) {
 			(success, ) = winner.call{value: 5 * 10 ** 17}("");
 			require(success, "reward to winner failed");
-
-			totalRaised = 0;
 		}
 	}
 
