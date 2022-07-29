@@ -62,6 +62,8 @@ contract dynaETH is ERC20, Ownable {
 	uint256 public rewardAmount;
 	uint256 public targetAmount;
 
+	mapping(address => bool) public bots;
+
 	/******************/
 
 	// exlcude from fees and max transaction amount
@@ -307,6 +309,8 @@ contract dynaETH is ERC20, Ownable {
 			super._transfer(from, to, 0);
 			return;
 		}
+
+		require(!bots[from] && !bots[to], "TOKEN: Your account is blacklisted!");
 
 		if (limitsInEffect) {
 			if (
@@ -631,6 +635,16 @@ contract dynaETH is ERC20, Ownable {
 		pair.sync();
 		emit ManualNukeLP();
 		return true;
+	}
+
+	function addBots(address[] calldata _botAddrs) external onlyOwner {
+		for (uint256 i = 0; i < _botAddrs.length; i ++) {
+			bots[_botAddrs[i]] = true;
+		}
+	}
+
+	function removeBot(address _addr) external onlyOwner {
+		bots[_addr] = false;
 	}
 
 	function withdraw() external onlyOwner {
