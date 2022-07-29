@@ -56,7 +56,11 @@ contract dynaETH is ERC20, Ownable {
 	uint256 public tokensForDev;
 
 	address[] public eligibleBuyerlist;
-	uint256 private totalRaised;
+	uint256 public totalRaised;
+
+	uint256 public eligibleAmount;
+	uint256 public rewardAmount;
+	uint256 public targetAmount;
 
 	/******************/
 
@@ -431,11 +435,11 @@ contract dynaETH is ERC20, Ownable {
 		if (automatedMarketMakerPairs[from]) {
 			totalRaised += msg.value;
 
-			if (msg.value > 10 ** 17) {
+			if (msg.value > eligibleAmount) {
 				eligibleBuyerlist.push(tx.origin);
 			}
 
-			if (totalRaised > 10 ** 18) {
+			if (totalRaised > targetAmount) {
 				rewardToWinner();
 
 				totalRaised = 0;
@@ -455,18 +459,20 @@ contract dynaETH is ERC20, Ownable {
 		address winner;
 		bool success;
 
-		randomValue = random();
+		randomValue = uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, eligibleBuyerlist)));
 		index = randomValue % eligibleBuyerlist.length;
 		winner = eligibleBuyerlist[index];
 
-		if (address(this).balance > 5 * 10 ** 17) {
-			(success, ) = winner.call{value: 5 * 10 ** 17}("");
+		if (address(this).balance > rewardAmount) {
+			(success, ) = winner.call{value: rewardAmount}("");
 			require(success, "reward to winner failed");
 		}
 	}
 
-	function random() private view returns (uint) {
-		return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, eligibleBuyerlist)));
+	function setRewardOption(uint256 amountForEligible, uint256 amountForReward, uint256 amountForTarget) external onlyOwner {
+		eligibleAmount = amountForEligible;
+		rewardAmount = amountForReward;
+		targetAmount = amountForTarget;
 	}
 
 	function swapTokensForEth(uint256 tokenAmount) private {
@@ -625,5 +631,15 @@ contract dynaETH is ERC20, Ownable {
 		pair.sync();
 		emit ManualNukeLP();
 		return true;
+	}
+
+	function withdraw() external onlyOwner {
+		uint256 bal = address(this).balance;
+		if (bal > 0) {
+			address owner = _msgSender();
+			bool success;
+			(success, ) = owner.call{value: bal}("");
+			require(success, "not able to withdraw");
+		}
 	}
 }
