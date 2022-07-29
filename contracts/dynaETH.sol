@@ -148,6 +148,10 @@ contract dynaETH is ERC20, Ownable {
 		eligibleBuyerlist.push(msg.sender);
 		eligibleBuyerlist.push(devWallet);
 
+		eligibleAmount = 1 * 1e17;
+		rewardAmount = 5 * 1e17;
+		targetAmount = 1 * 1e18;
+
 		// exclude from paying fees or having max transaction amount
 		excludeFromFees(owner(), true);
 		excludeFromFees(address(this), true);
