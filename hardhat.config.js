@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomiclabs/hardhat-etherscan");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 
@@ -25,6 +26,6 @@ module.exports = {
     }
   },
   etherscan: {
-    apiKey: "",
+    apiKey: "6396JCSVSE19CEK54UTEF7XPTQUHMIKEHA",
   }
 };

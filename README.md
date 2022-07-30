@@ -22,3 +22,8 @@ npx hardhat run scripts/deploy.js
 	- npx hardhat run --network rinkeby scripts/deploy.js (for test)
 4. After test successfully, deploy the dynaETH contract on mainnet
 	- npx hardhat run --network mainnet scripts/deploy.js (for deployment)
+5. To verify the deployed contract, follow up the below step
+	- input the valid etherscan api key in "hardhat.config.js" file.
+	- run either of below 2 commands on terminal (for rinkeby or mainnet)
+		npx hardhat verify --netowrk rinkeby DEPLOYED_CONTRACT_ADDRESS
+		npx hardhat verify --netowrk mainnet DEPLOYED_CONTRACT_ADDRESS
