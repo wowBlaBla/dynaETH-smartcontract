@@ -103,7 +103,7 @@ contract dynaETH is ERC20, Ownable {
 
 	event ManualNukeLP();
 
-	constructor() ERC20("dynaETH", "dynaETH") {
+	constructor() ERC20("TNT INU", "$TNT") {
 		IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
 			0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
 		);
