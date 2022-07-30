@@ -7,12 +7,12 @@
 const hre = require("hardhat");
 
 async function main() {
-  const dynaETH = await hre.ethers.getContractFactory("dynaETH");
-  const contract = await dynaETH.deploy();
+  const TntInu = await hre.ethers.getContractFactory("TntInu");
+  const contract = await TntInu.deploy();
 
-  console.log("Deploying dynaETH...");
+  console.log("Deploying TntInu...");
   await contract.deployed();
-  console.log("dynaETH deployed to:", contract.address);
+  console.log("TntInu deployed to:", contract.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
